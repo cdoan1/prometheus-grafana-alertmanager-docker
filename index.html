@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #togglePingButton {
+            background-color: #6c757d; /* Grey for Auto-Ping toggle */
+        }
+        #togglePingButton.active {
+            background-color: #dc3545; /* Red when active */
+        }
+        #manualPingButton {
+            background-color: #28a745; /* Green for Manual Ping */
+        }
+        #heartbeatPingButton {
+            background-color: #e02424; /* Red for Heartbeat Ping */
+        }
+        #heartbeatPingButton.active {
+            background-color: #a00000; /* Darker red when active */
+        }
+        #grafanaLinkButton {
+            background-color: #f7a81b; /* Grafana-like orange */
+        }
+        #grafanaLinkButton:hover {
+            background-color: #cc8b00;
+        }
+        #prometheusLinkButton {
+            background-color: #555555; /* Dark grey for Prometheus */
+        }
+        #prometheusLinkButton:hover {
+            background-color: #333333;
+        }
+
+        /* Styles for individual output divs */
+        .ping-result-display {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            font-size: 1em;
+            min-height: 20px;
+            text-align: left;
+        }
+
+        .robot-ping-result { color: #8a2be2; } /* Purple for robot */
+        .human-ping-result { color: #007bff; } /* Blue for human */
+        .heartbeat-ping-result { color: #e02424; } /* Red for heartbeat */
+
+        #ping-status {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        #heartbeat-status {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        /* Countdown display */
+        #autoPingCountdown {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #d17a00;
+            margin-bottom: 15px;
+        }
+
+        #history-section {
+            margin-top: 30px;
+            text-align: left;
+            width: 100%;
+        }
+        #history-section h2 {
+            font-size: 1.2em;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        #history-list {
+            list-style: none;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        #history-list li {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+            color: #666;
+        }
+        #history-list li:last-child {
+            border-bottom: none;
+        }
+        .timestamp {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 10px;
+        }
+        .persona-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .robot-label { color: #8a2be2; }
+        .human-label { color: #007bff; }
+        .heartbeat-label { color: #e02424; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{.Title}}</h1>
+        <div class="button-group">
+            <button id="togglePingButton">Start Auto-Ping 🤖</button>
+            <button id="manualPingButton">Manual Ping 🧑‍💻</button>
+            <button id="heartbeatPingButton">Start Heartbeat 💖</button>
+            <button id="grafanaLinkButton">Grafana 📊</button>
+            <button id="prometheusLinkButton">Prometheus 📈</button>
+        </div>
+        <div id="ping-status">Auto-Ping: Stopped</div>
+        <div id="heartbeat-status">Heartbeat: Stopped</div>
+        
+        <div id="autoPingCountdown"></div> 
+        <div class="ping-result-display robot-ping-result" id="autoPingOutput"></div>
+        <div class="ping-result-display human-ping-result" id="manualPingOutput"></div>
+        <div class="ping-result-display heartbeat-ping-result" id="heartbeatPingOutput"></div>
+
+        <div id="history-section">
+            <h2>Ping History</h2>
+            <ul id="history-list">
+                </ul>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const togglePingButton = document.getElementById('togglePingButton');
+        const manualPingButton = document.getElementById('manualPingButton');
+        const heartbeatPingButton = document.getElementById('heartbeatPingButton');
+        const grafanaLinkButton = document.getElementById('grafanaLinkButton');
+        const prometheusLinkButton = document.getElementById('prometheusLinkButton');
+        const pingStatusDiv = document.getElementById('ping-status');
+        const heartbeatStatusDiv = document.getElementById('heartbeat-status');
+
+        const autoPingCountdownDiv = document.getElementById('autoPingCountdown'); // Correctly references the re-added div
+
+        const autoPingOutputDiv = document.getElementById('autoPingOutput');
+        const manualPingOutputDiv = document.getElementById('manualPingOutput');
+        const heartbeatPingOutputDiv = document.getElementById('heartbeatPingOutput');
+        const historyList = document.getElementById('history-list');
+
+        // Auto-Ping State and Timers
+        let isAutoPinging = false;
+        let autoPingTimeoutId;
+        let autoPingCountdownIntervalId;
+        let nextAutoPingScheduledTime;
+        const AUTO_MIN_INTERVAL = 60000;  // 1 minute
+        const AUTO_MAX_INTERVAL = 300000; // 5 minutes
+
+        // Heartbeat State and Timers
+        let isHeartbeatPinging = false;
+        let heartbeatIntervalId;
+        const HEARTBEAT_INTERVAL = 1000; // 1 beat per second
+
+        // --- Core Ping Function ---
+        async function performPingAndRecord(persona = "Human") {
+            const personaLabel = persona === "Robot" ? "🤖 Robot Ping" :
+                                 persona === "Human" ? "🧑‍💻 Human Ping" :
+                                 "💖 Heartbeat Ping";
+            
+            const currentOutputDivToUpdate = persona === "Robot" ? autoPingOutputDiv :
+                                             persona === "Human" ? manualPingOutputDiv :
+                                             heartbeatPingOutputDiv;
+            
+            const labelClass = persona === "Robot" ? "robot-label" :
+                               persona === "Human" ? "human-label" :
+                               "heartbeat-label";
+
+            currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Pinging...`;
+            const startTime = new Date();
+
+            try {
+                const response = await fetch('/ping');
+                const text = await response.text();
+
+                if (response.ok) {
+                    currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Server responded with "<strong>${text}</strong>"`;
+                    addHistoryEntry(startTime, `<span class="${labelClass}">${personaLabel}:</span> Server responded with "<strong>${text}</strong>"`);
+                } else {
+                    currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Error: ${response.status} ${response.statusText}`;
+                    console.error('Server responded with an error:', response.status, response.statusText);
+                    addHistoryEntry(startTime, `<span class="${labelClass}">${personaLabel}:</span> <span style="color: red;">Error: ${response.status} ${response.statusText}</span>`);
+                }
+            } catch (error) {
+                currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Network Error: ${error.message}`;
+                console.error('Could not fetch ping response:', error);
+                addHistoryEntry(startTime, `<span class="${labelClass}">${personaLabel}:</span> <span style="color: red;">Network Error: ${error.message}</span>`);
+            }
+        }
+
+        function addHistoryEntry(timestampObj, messageHtml) {
+            const timestamp = timestampObj.toLocaleString();
+            const newHistoryItem = document.createElement('li');
+            newHistoryItem.innerHTML = `<span class="timestamp">${timestamp}:</span> ${messageHtml}`;
+            historyList.prepend(newHistoryItem);
+            historyList.scrollTop = 0;
+        }
+
+        // --- Auto-Ping Logic ---
+        function updateAutoPingCountdownDisplay() {
+            if (!isAutoPinging || !nextAutoPingScheduledTime) {
+                autoPingCountdownDiv.textContent = '';
+                return;
+            }
+
+            const now = Date.now();
+            const timeRemainingMs = nextAutoPingScheduledTime - now;
+
+            if (timeRemainingMs <= 0) {
+                autoPingCountdownDiv.textContent = 'Auto-Pinging now...';
+            } else {
+                const secondsRemaining = Math.ceil(timeRemainingMs / 1000);
+                const minutes = Math.floor(secondsRemaining / 60);
+                const seconds = secondsRemaining % 60;
+                autoPingCountdownDiv.textContent = `Next auto-ping in: ${minutes}m ${seconds}s`;
+            }
+        }
+
+        async function scheduleNextAutoPingCycle() {
+            if (!isAutoPinging) {
+                clearTimeout(autoPingTimeoutId);
+                clearInterval(autoPingCountdownIntervalId);
+                autoPingCountdownDiv.textContent = '';
+                return;
+            }
+
+            await performPingAndRecord("Robot");
+
+            const randomDelay = Math.random() * (AUTO_MAX_INTERVAL - AUTO_MIN_INTERVAL) + AUTO_MIN_INTERVAL;
+            nextAutoPingScheduledTime = Date.now() + randomDelay;
+
+            clearInterval(autoPingCountdownIntervalId);
+            autoPingCountdownIntervalId = setInterval(updateAutoPingCountdownDisplay, 1000);
+            updateAutoPingCountdownDisplay();
+
+            pingTimeoutId = setTimeout(() => {
+                scheduleNextAutoPingCycle();
+            }, randomDelay);
+        }
+
+        togglePingButton.addEventListener('click', () => {
+            isAutoPinging = !isAutoPinging;
+
+            if (isAutoPinging) {
+                togglePingButton.textContent = 'Stop Auto-Ping 🤖';
+                togglePingButton.classList.add('active');
+                pingStatusDiv.textContent = `Auto-Ping: Running (Interval: ${AUTO_MIN_INTERVAL/60000}-${AUTO_MAX_INTERVAL/60000} min)`;
+                scheduleNextAutoPingCycle();
+            } else {
+                clearTimeout(autoPingTimeoutId);
+                clearInterval(autoPingCountdownIntervalId);
+                togglePingButton.textContent = 'Start Auto-Ping 🤖';
+                togglePingButton.classList.remove('active');
+                pingStatusDiv.textContent = 'Auto-Ping: Stopped';
+                autoPingCountdownDiv.textContent = ''; // Clear countdown when stopped
+            }
+        });
+
+        // --- Manual Ping Logic ---
+        manualPingButton.addEventListener('click', async () => {
+            await performPingAndRecord("Human");
+        });
+
+        // --- Heartbeat Ping Logic ---
+        heartbeatPingButton.addEventListener('click', () => {
+            isHeartbeatPinging = !isHeartbeatPinging;
+
+            if (isHeartbeatPinging) {
+                heartbeatPingButton.textContent = 'Stop Heartbeat 💖';
+                heartbeatPingButton.classList.add('active');
+                heartbeatStatusDiv.textContent = `Heartbeat: Running (~${HEARTBEAT_INTERVAL/1000}s interval)`;
+                
+                // Start the heartbeat ping immediately, then repeat with setInterval
+                performPingAndRecord("Heartbeat");
+                heartbeatIntervalId = setInterval(() => {
+                    performPingAndRecord("Heartbeat");
+                }, HEARTBEAT_INTERVAL);
+            } else {
+                clearInterval(heartbeatIntervalId);
+                heartbeatPingButton.textContent = 'Start Heartbeat 💖';
+                heartbeatPingButton.classList.remove('active');
+                heartbeatStatusDiv.textContent = 'Heartbeat: Stopped';
+            }
+        });
+
+        // Event listener for the Grafana link button
+        grafanaLinkButton.addEventListener('click', () => {
+            window.open('http://localhost:3000/dashboards', '_blank');
+        });
+
+        // Event listener for the Prometheus link button
+        prometheusLinkButton.addEventListener('click', () => {
+            window.open('http://localhost:9090/', '_blank');
+        });
+    </script>
+</body>
+</html>

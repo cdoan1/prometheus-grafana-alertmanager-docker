@@ -1,0 +1,750 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Dashboard to visualize Ginkgo test execution results from Prometheus.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "threshold"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": "Success ✅",
+                "1": "Failure ❌"
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": [
+            {
+              "color": "#30A400"
+            },
+            {
+              "color": "#E53935",
+              "value": 1
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_job_overall_status{job_name=~\"${job_name}\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Overall Job Status",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": [
+            {
+              "color": "#E53935"
+            },
+            {
+              "color": "#FFC800",
+              "value": 70
+            },
+            {
+              "color": "#30A400",
+              "value": 90
+            }
+          ],
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 4
+      },
+      "id": 2,
+      "options": {
+        "minVizHeight": 45,
+        "minVizWidth": 45,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_pass_rate_percentage{job_name=~\"${job_name}\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Pass Rate Percentage - ${job_name}",
+      "transparent": true,
+      "repeat": "job_name",
+      "repeatDirection": "h",
+      "type": "gauge"
+    },
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#5794F2",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 10
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_total_cases{job_name=~\"${job_name}\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Cases",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#30A400",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 10
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_passed_cases{job_name=~\"${job_name}\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Passed Cases",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#E53935",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 10
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_failed_cases{job_name=~\"${job_name}\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Failed Cases",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#FFC800",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 10
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_errored_cases{job_name=~\"${job_name}\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Errored Cases",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": [
+            {
+              "color": "#E53935",
+              "value": 70
+            },
+            {
+              "color": "#FFC800",
+              "value": 90
+            },
+            {
+              "color": "#30A400"
+            }
+          ],
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_pass_rate_percentage{job_name=~\"${job_name}\"}",
+          "refId": "A",
+          "legendFormat": "{{job_name}}"
+        }
+      ],
+      "title": "Pass Rate Trend Over Time",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "dataSource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "default_prometheus_ds"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "threshold"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": "",
+                "1": "Active"
+              },
+              "type": "value"
+            }
+          ],
+          "max": 1,
+          "min": 0,
+          "thresholds": [
+            {
+              "color": "#E53935"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "cellOptions": {
+          "cellHeight": "fixed",
+          "fixedCellHeight": 17
+        },
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 0,
+        "showHeader": true,
+        "sortBy": {
+          "desc": true,
+          "field": "Value"
+        }
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "default_prometheus_ds"
+          },
+          "expr": "ginkgo_test_case_status{job_name=~\"${job_name}\",status_type=~\"failed|errored\"} == 1",
+          "legendFormat": "{{job_name}} - {{test_title}} ({{status_type}})",
+          "refId": "A"
+        }
+      ],
+      "title": "Currently Failing / Errored Tests",
+      "transformations": [
+        {
+          "id": "groupBys",
+          "options": {
+            "groupBy": [
+              "job_name",
+              "test_title",
+              "status_type"
+            ],
+            "select": [
+              {
+                "field": "Value",
+                "reducer": "last"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": false,
+            "indexByName": {
+              "Value": 3,
+              "job_name": 0,
+              "status_type": 2,
+              "test_title": 1
+            },
+            "order": [
+              "Job Name",
+              "Test Case",
+              "Status",
+              "Value"
+            ],
+            "renameByName": {
+              "job_name": "Job Name",
+              "status_type": "Status",
+              "test_title": "Test Case"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": true,
+            "indexByName": {},
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "",
+            "mode": "merge",
+            "reduce": {
+              "calcs": [],
+              "fields": ""
+            },
+            "replaceCalc": false,
+            "series": ""
+          }
+        },
+        {
+          "id": "filterFields",
+          "options": {
+            "include": {
+              "names": [
+                "Job Name",
+                "Test Case",
+                "Status"
+              ]
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 1,
+          "color": {
+            "mode": "threshold"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": "",
+                "1": "Active"
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": [
+            {
+              "color": "#E53935",
+              "value": null
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "transparent": true,
+      "type": "table"
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "dataSource": "Prometheus",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "default_prometheus_ds"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "job_name",
+        "options": [],
+        "query": "label_values(ginkgo_total_cases, job_name)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Ginkgo Test Results Overview",
+  "uid": "ginkgo-test-results-df",
+  "version": 2,
+  "weekStart": ""
+}

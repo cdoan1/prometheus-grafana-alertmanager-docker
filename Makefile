@@ -22,6 +22,15 @@ build:
 		server
 	docker compose up -d server
 
+start:
+	@echo "Start and Docker Compose services..."
+	docker compose up
+
+stop:
+	@echo "Stopping and Docker Compose services..."
+	docker compose down
+
+
 # run: build
 # 	@echo "Running Docker Compose services..."
 # 	docker compose up -d

@@ -62,15 +62,13 @@
         #grafanaLinkButton {
             background-color: #f7a81b; /* Grafana-like orange */
         }
-        #grafanaLinkButton:hover {
-            background-color: #cc8b00;
-        }
-        #prometheusLinkButton {
-            background-color: #555555; /* Dark grey for Prometheus */
+        #prometheusLinkButton { /* Prometheus button color */
+            background-color: #555555; /* Dark grey */
         }
         #prometheusLinkButton:hover {
             background-color: #333333;
         }
+
 
         /* Styles for individual output divs */
         .ping-result-display {
@@ -164,8 +162,7 @@
         <div id="ping-status">Auto-Ping: Stopped</div>
         <div id="heartbeat-status">Heartbeat: Stopped</div>
         
-        <div id="autoPingCountdown"></div> 
-        <div class="ping-result-display robot-ping-result" id="autoPingOutput"></div>
+        <div id="autoPingCountdown"></div> <div class="ping-result-display robot-ping-result" id="autoPingOutput"></div>
         <div class="ping-result-display human-ping-result" id="manualPingOutput"></div>
         <div class="ping-result-display heartbeat-ping-result" id="heartbeatPingOutput"></div>
 
@@ -186,7 +183,7 @@
         const pingStatusDiv = document.getElementById('ping-status');
         const heartbeatStatusDiv = document.getElementById('heartbeat-status');
 
-        const autoPingCountdownDiv = document.getElementById('autoPingCountdown'); // Correctly references the re-added div
+        const autoPingCountdownDiv = document.getElementById('autoPingCountdown');
 
         const autoPingOutputDiv = document.getElementById('autoPingOutput');
         const manualPingOutputDiv = document.getElementById('manualPingOutput');
@@ -239,6 +236,12 @@
                 currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Network Error: ${error.message}`;
                 console.error('Could not fetch ping response:', error);
                 addHistoryEntry(startTime, `<span class="${labelClass}">${personaLabel}:</span> <span style="color: red;">Network Error: ${error.message}</span>`);
+            } finally {
+                // Ensure manual button is re-enabled
+                if (persona === "Human") {
+                    manualPingButton.disabled = false;
+                    manualPingButton.textContent = 'Manual Ping 🧑‍💻';
+                }
             }
         }
 
@@ -261,7 +264,7 @@
             const timeRemainingMs = nextAutoPingScheduledTime - now;
 
             if (timeRemainingMs <= 0) {
-                autoPingCountdownDiv.textContent = 'Auto-Pinging now...';
+                autoPingCountdownDiv.textContent = 'Pinging now...';
             } else {
                 const secondsRemaining = Math.ceil(timeRemainingMs / 1000);
                 const minutes = Math.floor(secondsRemaining / 60);
@@ -324,7 +327,6 @@
                 heartbeatPingButton.classList.add('active');
                 heartbeatStatusDiv.textContent = `Heartbeat: Running (~${HEARTBEAT_INTERVAL/1000}s interval)`;
                 
-                // Start the heartbeat ping immediately, then repeat with setInterval
                 performPingAndRecord("Heartbeat");
                 heartbeatIntervalId = setInterval(() => {
                     performPingAndRecord("Heartbeat");
@@ -333,7 +335,7 @@
                 clearInterval(heartbeatIntervalId);
                 heartbeatPingButton.textContent = 'Start Heartbeat 💖';
                 heartbeatPingButton.classList.remove('active');
-                heartbeatStatusDiv.textContent = 'Heartbeat: Stopped';
+                heartbeatStatusDiv.textContent = 'Stopped';
             }
         });
 

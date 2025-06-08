@@ -18,6 +18,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+// These variables will be populated at build time using ldflags
+// For local 'go run', they will retain their default values.
+var (
+	buildVersion = "v0.0.0-dev"  // Default version for local development
+	buildCommit  = "local-build" // Default commit hash for local development
+)
+
 // Global Prometheus counter for ping requests
 var pingCounter = prometheus.NewCounter(
 	prometheus.CounterOpts{
@@ -26,9 +33,10 @@ var pingCounter = prometheus.NewCounter(
 	},
 )
 
-// PageData struct for passing data to the HTML template (optional for this simple case)
+// PageData struct for passing data to the HTML template
 type PageData struct {
-	Title string
+	Title   string
+	Version string // NEW: Field for version information
 }
 
 // Handler for the root path ("/") - serves the HTML page
@@ -38,8 +46,6 @@ func servePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse the HTML template from index.html
-	// Make sure index.html is in the same directory as your Go executable
 	tmpl, err := template.ParseFiles("index.html")
 	if err != nil {
 		log.Printf("Error parsing template: %v", err)
@@ -47,8 +53,12 @@ func servePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Execute the template, passing the title
-	data := PageData{Title: "My Ping-Pong App"}
+	// NEW: Pass version information to the template
+	// Format the version string nicely: e.g., "v1.0.0 (abcdef1)"
+	data := PageData{
+		Title:   "Ping-Pong: Human, Robot, Heartbeat",
+		Version: fmt.Sprintf("Version: %s (%s)", buildVersion, buildCommit),
+	}
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		log.Printf("Error executing template: %v", err)
@@ -323,6 +333,6 @@ func main() {
 		port = "8090"
 	}
 
-	log.Printf("Server starting on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil)) // Start the HTTP server
+	log.Printf("Server starting on :%s (Version: %s)", port, fmt.Sprintf("%s (%s)", buildVersion, buildCommit))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

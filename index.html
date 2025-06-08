@@ -18,24 +18,9 @@
             --color-border-secondary: #eee;
             --color-shadow-light: rgba(0, 0, 0, 0.08);
             --color-shadow-medium: rgba(0, 0, 0, 0.15);
-
-            /* Button Colors - unchanged from light mode */
-            --color-btn-auto-bg: #6c757d;
-            --color-btn-auto-active-bg: #dc3545;
-            --color-btn-manual-bg: #28a745;
-            --color-btn-heartbeat-bg: #ff5722;
-            --color-btn-heartbeat-active-bg: #d84315;
-            --color-btn-grafana-bg: #f7a81b;
-            --color-btn-prometheus-bg: #4CAF50;
-            --color-btn-disabled-bg: #cccccc;
-
-            /* Persona colors */
-            --color-persona-robot: #8a2be2;
-            --color-persona-human: #007bff;
-            --color-persona-heartbeat: #e02424;
-            --color-countdown: #d17a00;
-            --color-timestamp: #555;
-            --color-error-text: red;
+            --border-radius: 8px;
+            --color-footer-bg: #e9ecef; /* Light grey for footer */
+            --color-footer-text: #6c757d; /* Darker grey for footer text */
         }
 
         /* Define color variables for dark mode */
@@ -69,6 +54,8 @@
             --color-countdown: #ffc107; /* Brighter orange/yellow */
             --color-timestamp: #bbbbbb;
             --color-error-text: #ff6b6b; /* Brighter red for errors */
+            --color-footer-bg: #1a1e22; /* Darker grey for footer */
+            --color-footer-text: #99a0a8; /* Lighter grey for footer text */
         }
 
 
@@ -90,7 +77,7 @@
             border-radius: var(--border-radius);
             box-shadow: 0 8px 20px var(--color-shadow-light);
             text-align: center;
-            max-width: 750px;
+            max-width: 750px; /* Slightly wider */
             width: 90%;
             border: 1px solid var(--color-border-primary);
             transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
@@ -105,31 +92,31 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
+            margin-bottom: 40px; /* More vertical space */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
         }
         button {
-            padding: 14px 28px;
+            padding: 14px 28px; /* Larger hit area */
             font-size: 1.05em;
             font-weight: 600;
             color: white; /* Text color remains white for buttons */
             border: none;
-            border-radius: var(--border-radius);
+            border-radius: 8px; /* Slightly more rounded corners */
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.15s ease, box-shadow 0.2s ease;
             box-shadow: 0 3px 6px var(--color-shadow-light);
-            flex-grow: 1;
-            max-width: 200px;
+            flex-grow: 1; /* Allow buttons to grow */
+            max-width: 200px; /* Limit button width */
         }
         button:hover:not(:disabled) {
-            transform: translateY(-3px);
+            transform: translateY(-3px); /* More pronounced lift */
             box-shadow: 0 6px 12px var(--color-shadow-medium);
         }
         button:disabled {
             background-color: var(--color-btn-disabled-bg);
             cursor: not-allowed;
             opacity: 0.7;
-            transform: none;
+            transform: none; /* No lift when disabled */
             box-shadow: none;
         }
 
@@ -141,12 +128,13 @@
         #heartbeatPingButton.active { background-color: var(--color-btn-heartbeat-active-bg); }
         #grafanaLinkButton { background-color: var(--color-btn-grafana-bg); }
         #prometheusLinkButton { background-color: var(--color-btn-prometheus-bg); }
-        #themeToggleButton { /* NEW: Theme Toggle Button Style */
-            background-color: var(--color-text-secondary);
+        #themeToggleButton {
+            background-color: var(--color-text-secondary); /* Uses text color for background */
+            color: var(--color-background-container); /* Text color from container background */
             font-size: 0.9em;
             padding: 8px 15px;
             flex-grow: 0;
-            margin-left: auto; /* Push to the right */
+            margin-left: auto;
             box-shadow: none;
             width: auto;
         }
@@ -280,6 +268,28 @@
         .history-persona-label.robot-label { color: var(--color-persona-robot); }
         .history-persona-label.human-label { color: var(--color-persona-human); }
         .history-persona-label.heartbeat-label { color: var(--color-persona-heartbeat); }
+
+        /* NEW: Footer Styling */
+        footer {
+            margin-top: 40px;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--color-footer-bg);
+            color: var(--color-footer-text);
+            font-size: 0.85em;
+            text-align: center;
+            border-top: 1px solid var(--color-border-primary);
+            box-shadow: 0 -2px 8px var(--color-shadow-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        footer a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -291,7 +301,8 @@
             <button id="heartbeatPingButton">Start Heartbeat 💖</button>
             <button id="grafanaLinkButton">Grafana 📊</button>
             <button id="prometheusLinkButton">Prometheus 📈</button>
-            <button id="themeToggleButton">Toggle Theme ☀️</button> </div>
+            <button id="themeToggleButton">Toggle Theme ☀️</button>
+        </div>
 
         <div class="status-group">
             <div class="status-item" id="autoPingStatusItem">
@@ -323,15 +334,19 @@
         </div>
     </div>
 
+    <footer>
+        <p>{{.Version}}</p>
+        <p>Built with ❤️ by Gemini</p>
+    </footer>
     <script>
         // DOM Elements
-        const htmlElement = document.documentElement; // Get the root HTML element
+        const htmlElement = document.documentElement;
         const togglePingButton = document.getElementById('togglePingButton');
         const manualPingButton = document.getElementById('manualPingButton');
         const heartbeatPingButton = document.getElementById('heartbeatPingButton');
         const grafanaLinkButton = document.getElementById('grafanaLinkButton');
         const prometheusLinkButton = document.getElementById('prometheusLinkButton');
-        const themeToggleButton = document.getElementById('themeToggleButton'); // NEW: Theme button
+        const themeToggleButton = document.getElementById('themeToggleButton');
         
         const pingStatusText = document.getElementById('ping-status');
         const heartbeatStatusText = document.getElementById('heartbeat-status');
@@ -395,6 +410,7 @@
                                  persona === "Human" ? "🧑‍💻 Human Ping" :
                                  "💖 Heartbeat Ping";
             
+            // Get the specific output div based on persona
             const currentOutputDivToUpdate = persona === "Robot" ? autoPingOutputDiv :
                                              persona === "Human" ? manualPingOutputDiv :
                                              heartbeatPingOutputDiv;
@@ -537,11 +553,12 @@
             }
         });
 
-        // --- External Link Buttons ---
+        // Event listener for the Grafana link button
         grafanaLinkButton.addEventListener('click', () => {
             window.open('http://localhost:3000/dashboards', '_blank');
         });
 
+        // Event listener for the Prometheus link button
         prometheusLinkButton.addEventListener('click', () => {
             window.open('http://localhost:9090/', '_blank');
         });

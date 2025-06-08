@@ -5,148 +5,212 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
     <style>
+        :root {
+            --primary-blue: #007bff;
+            --primary-green: #28a745;
+            --primary-red: #dc3545;
+            --primary-orange: #ff5722;
+            --primary-purple: #8a2be2;
+            --secondary-gray: #6c757d;
+            --dark-gray: #343a40;
+            --light-gray-bg: #f8f9fa;
+            --border-color: #e0e0e0;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --border-radius: 8px;
+        }
+
         body {
-            font-family: sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #f0f2f5;
+            color: var(--dark-gray);
         }
         .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px var(--shadow-light);
             text-align: center;
-            max-width: 600px;
+            max-width: 750px; /* Slightly wider */
             width: 90%;
+            border: 1px solid var(--border-color);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
         }
         .button-group {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 40px; /* More vertical space */
             flex-wrap: wrap;
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 14px 28px; /* Larger hit area */
+            font-size: 1.05em;
+            font-weight: 600;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.15s ease, box-shadow 0.2s ease;
+            box-shadow: 0 3px 6px var(--shadow-light);
+            flex-grow: 1; /* Allow buttons to grow */
+            max-width: 200px; /* Limit button width */
         }
-        button:hover {
-            opacity: 0.9;
+        button:hover:not(:disabled) {
+            transform: translateY(-3px); /* More pronounced lift */
+            box-shadow: 0 6px 12px var(--shadow-medium);
         }
-        #togglePingButton {
-            background-color: #6c757d; /* Grey for Auto-Ping toggle */
-        }
-        #togglePingButton.active {
-            background-color: #dc3545; /* Red when active */
-        }
-        #manualPingButton {
-            background-color: #28a745; /* Green for Manual Ping */
-        }
-        #heartbeatPingButton {
-            background-color: #e02424; /* Red for Heartbeat Ping */
-        }
-        #heartbeatPingButton.active {
-            background-color: #a00000; /* Darker red when active */
-        }
-        #grafanaLinkButton {
-            background-color: #f7a81b; /* Grafana-like orange */
-        }
-        #prometheusLinkButton { /* Prometheus button color */
-            background-color: #555555; /* Dark grey */
-        }
-        #prometheusLinkButton:hover {
-            background-color: #333333;
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none; /* No lift when disabled */
+            box-shadow: none;
         }
 
+        /* Specific Button Colors */
+        #togglePingButton { background-color: var(--secondary-gray); }
+        #togglePingButton.active { background-color: var(--primary-red); }
+        #manualPingButton { background-color: var(--primary-green); }
+        #heartbeatPingButton { background-color: var(--primary-orange); }
+        #heartbeatPingButton.active { background-color: #d84315; } /* Darker orange-red */
+        #grafanaLinkButton { background-color: #f7a81b; } /* Grafana orange */
+        #prometheusLinkButton { background-color: #4CAF50; } /* Prometheus green */
 
-        /* Styles for individual output divs */
-        .ping-result-display {
-            margin-top: 10px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f0f0f0;
-            font-size: 1em;
-            min-height: 20px;
-            text-align: left;
+        /* Status and Countdown Group */
+        .status-group {
+            display: grid; /* Use grid for better alignment */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+            gap: 15px;
+            margin-bottom: 30px;
+            width: 100%;
         }
-
-        .robot-ping-result { color: #8a2be2; } /* Purple for robot */
-        .human-ping-result { color: #007bff; } /* Blue for human */
-        .heartbeat-ping-result { color: #e02424; } /* Red for heartbeat */
-
-        #ping-status {
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            color: #555;
+        .status-item {
+            font-size: 0.95em;
+            color: var(--dark-gray);
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            background-color: var(--light-gray-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px var(--shadow-light);
         }
-        #heartbeat-status {
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            color: #555;
+        .status-item.active {
+            background-color: #e6ffe6; /* Light green for active */
+            border-color: #a3e6a3;
         }
-
-        /* Countdown display */
+        .status-item.active-red { /* For heartbeat active, different color */
+            background-color: #ffe6e6; /* Light red */
+            border-color: #ffb3b3;
+        }
+        .status-label {
+            font-weight: 700; /* Bolder label */
+            color: #2c3e50;
+        }
         #autoPingCountdown {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #d17a00;
-            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #d17a00; /* Consistent orange for countdown */
         }
+        /* End Status and Countdown Group */
+
+        /* Individual Output Areas */
+        .ping-result-container {
+            margin-top: 25px;
+            width: 100%;
+            text-align: left;
+            border-top: 1px solid var(--border-color);
+            padding-top: 25px;
+        }
+        .ping-result-display-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: var(--dark-gray);
+            font-size: 1.05em;
+        }
+        .ping-result-display-wrapper {
+            margin-bottom: 20px; /* Space between results */
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background-color: var(--light-gray-bg);
+            font-size: 0.9em;
+            min-height: 40px; /* More vertical space for content */
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Subtle inner shadow */
+        }
+        /* Persona Colors for Output */
+        .robot-ping-result { border-left: 5px solid var(--primary-purple); } /* Left border color */
+        .human-ping-result { border-left: 5px solid var(--primary-blue); }
+        .heartbeat-ping-result { border-left: 5px solid var(--primary-red); }
+
+        .robot-ping-result > span.persona-label { color: var(--primary-purple); }
+        .human-ping-result > span.persona-label { color: var(--primary-blue); }
+        .heartbeat-ping-result > span.persona-label { color: var(--primary-red); }
+
+        /* End Individual Output Areas */
 
         #history-section {
             margin-top: 30px;
             text-align: left;
             width: 100%;
+            border-top: 1px solid var(--border-color);
+            padding-top: 25px;
         }
         #history-section h2 {
-            font-size: 1.2em;
-            color: #555;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 700;
         }
         #history-list {
             list-style: none;
             padding: 0;
-            max-height: 200px;
+            max-height: 300px; /* Increased history height */
             overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: #fdfdfd;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
         #history-list li {
-            padding: 8px 10px;
-            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0; /* Lighter separator */
             font-size: 0.9em;
-            color: #666;
+            color: #555;
+            display: flex;
+            align-items: flex-start;
+            word-break: break-word; /* Ensure long messages wrap */
         }
         #history-list li:last-child {
             border-bottom: none;
         }
         .timestamp {
-            font-weight: bold;
-            color: #007bff;
-            margin-right: 10px;
+            font-weight: 600;
+            color: #777; /* Softer color for timestamp */
+            margin-right: 20px;
+            flex-shrink: 0;
+            min-width: 160px; /* Ensure timestamp has enough space */
         }
-        .persona-label {
-            font-weight: bold;
-            margin-right: 5px;
-        }
-        .robot-label { color: #8a2be2; }
-        .human-label { color: #007bff; }
-        .heartbeat-label { color: #e02424; }
+        /* Persona labels inside history list */
+        .history-persona-label.robot-label { color: var(--primary-purple); }
+        .history-persona-label.human-label { color: var(--primary-blue); }
+        .history-persona-label.heartbeat-label { color: var(--primary-red); }
     </style>
 </head>
 <body>
@@ -159,12 +223,29 @@
             <button id="grafanaLinkButton">Grafana 📊</button>
             <button id="prometheusLinkButton">Prometheus 📈</button>
         </div>
-        <div id="ping-status">Auto-Ping: Stopped</div>
-        <div id="heartbeat-status">Heartbeat: Stopped</div>
-        
-        <div id="autoPingCountdown"></div> <div class="ping-result-display robot-ping-result" id="autoPingOutput"></div>
-        <div class="ping-result-display human-ping-result" id="manualPingOutput"></div>
-        <div class="ping-result-display heartbeat-ping-result" id="heartbeatPingOutput"></div>
+
+        <div class="status-group">
+            <div class="status-item" id="autoPingStatusItem">
+                <span class="status-label">Auto-Ping:</span> <span id="ping-status">Stopped</span>
+            </div>
+            <div class="status-item" id="heartbeatStatusItem">
+                <span class="status-label">Heartbeat:</span> <span id="heartbeat-status">Stopped</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Next Auto-Ping:</span> <span id="autoPingCountdown"></span>
+            </div>
+        </div>
+
+        <div class="ping-result-container">
+            <span class="ping-result-display-label robot-label">Last Robot Ping Result:</span>
+            <div class="ping-result-display-wrapper" id="autoPingOutput"></div>
+
+            <span class="ping-result-display-label human-label">Last Human Ping Result:</span>
+            <div class="ping-result-display-wrapper" id="manualPingOutput"></div>
+
+            <span class="ping-result-display-label heartbeat-label">Last Heartbeat Ping Result:</span>
+            <div class="ping-result-display-wrapper" id="heartbeatPingOutput"></div>
+        </div>
 
         <div id="history-section">
             <h2>Ping History</h2>
@@ -180,14 +261,20 @@
         const heartbeatPingButton = document.getElementById('heartbeatPingButton');
         const grafanaLinkButton = document.getElementById('grafanaLinkButton');
         const prometheusLinkButton = document.getElementById('prometheusLinkButton');
-        const pingStatusDiv = document.getElementById('ping-status');
-        const heartbeatStatusDiv = document.getElementById('heartbeat-status');
+        const pingStatusText = document.getElementById('ping-status');
+        const heartbeatStatusText = document.getElementById('heartbeat-status');
+
+        // Status Item wrappers for class toggling
+        const autoPingStatusItem = document.getElementById('autoPingStatusItem');
+        const heartbeatStatusItem = document.getElementById('heartbeatStatusItem');
 
         const autoPingCountdownDiv = document.getElementById('autoPingCountdown');
 
+        // Dedicated output divs
         const autoPingOutputDiv = document.getElementById('autoPingOutput');
         const manualPingOutputDiv = document.getElementById('manualPingOutput');
         const heartbeatPingOutputDiv = document.getElementById('heartbeatPingOutput');
+        
         const historyList = document.getElementById('history-list');
 
         // Auto-Ping State and Timers
@@ -209,6 +296,7 @@
                                  persona === "Human" ? "🧑‍💻 Human Ping" :
                                  "💖 Heartbeat Ping";
             
+            // Get the specific output div based on persona
             const currentOutputDivToUpdate = persona === "Robot" ? autoPingOutputDiv :
                                              persona === "Human" ? manualPingOutputDiv :
                                              heartbeatPingOutputDiv;
@@ -217,7 +305,15 @@
                                persona === "Human" ? "human-label" :
                                "heartbeat-label";
 
+            // Set loading state
             currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Pinging...`;
+            
+            // Disable manual button while pinging
+            if (persona === "Human") {
+                manualPingButton.disabled = true;
+                manualPingButton.textContent = 'Pinging...';
+            }
+
             const startTime = new Date();
 
             try {
@@ -226,18 +322,18 @@
 
                 if (response.ok) {
                     currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Server responded with "<strong>${text}</strong>"`;
-                    addHistoryEntry(startTime, `<span class="${labelClass}">${personaLabel}:</span> Server responded with "<strong>${text}</strong>"`);
+                    addHistoryEntry(startTime, `<span class="${labelClass} history-persona-label">${personaLabel}:</span> Server responded with "<strong>${text}</strong>"`);
                 } else {
                     currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Error: ${response.status} ${response.statusText}`;
                     console.error('Server responded with an error:', response.status, response.statusText);
-                    addHistoryEntry(startTime, `<span class="${labelClass}">${personaLabel}:</span> <span style="color: red;">Error: ${response.status} ${response.statusText}</span>`);
+                    addHistoryEntry(startTime, `<span class="${labelClass} history-persona-label">${personaLabel}:</span> <span style="color: red;">Error: ${response.status} ${response.statusText}</span>`);
                 }
             } catch (error) {
                 currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Network Error: ${error.message}`;
                 console.error('Could not fetch ping response:', error);
-                addHistoryEntry(startTime, `<span class="${labelClass}">${personaLabel}:</span> <span style="color: red;">Network Error: ${error.message}</span>`);
+                addHistoryEntry(startTime, `<span class="${labelClass} history-persona-label">${personaLabel}:</span> <span style="color: red;">Network Error: ${error.message}</span>`);
             } finally {
-                // Ensure manual button is re-enabled
+                // Re-enable manual button after ping completes
                 if (persona === "Human") {
                     manualPingButton.disabled = false;
                     manualPingButton.textContent = 'Manual Ping 🧑‍💻';
@@ -269,7 +365,7 @@
                 const secondsRemaining = Math.ceil(timeRemainingMs / 1000);
                 const minutes = Math.floor(secondsRemaining / 60);
                 const seconds = secondsRemaining % 60;
-                autoPingCountdownDiv.textContent = `Next auto-ping in: ${minutes}m ${seconds}s`;
+                autoPingCountdownDiv.textContent = `${minutes}m ${seconds}s`;
             }
         }
 
@@ -286,11 +382,11 @@
             const randomDelay = Math.random() * (AUTO_MAX_INTERVAL - AUTO_MIN_INTERVAL) + AUTO_MIN_INTERVAL;
             nextAutoPingScheduledTime = Date.now() + randomDelay;
 
-            clearInterval(autoPingCountdownIntervalId);
+            clearInterval(autoPingCountdownIntervalId); // Clear existing interval if any
             autoPingCountdownIntervalId = setInterval(updateAutoPingCountdownDisplay, 1000);
-            updateAutoPingCountdownDisplay();
+            updateAutoPingCountdownDisplay(); // Call immediately for initial display
 
-            pingTimeoutId = setTimeout(() => {
+            autoPingTimeoutId = setTimeout(() => {
                 scheduleNextAutoPingCycle();
             }, randomDelay);
         }
@@ -301,14 +397,16 @@
             if (isAutoPinging) {
                 togglePingButton.textContent = 'Stop Auto-Ping 🤖';
                 togglePingButton.classList.add('active');
-                pingStatusDiv.textContent = `Auto-Ping: Running (Interval: ${AUTO_MIN_INTERVAL/60000}-${AUTO_MAX_INTERVAL/60000} min)`;
+                autoPingStatusItem.classList.add('active'); // Activate status-item
+                pingStatusText.textContent = `Running (Interval: ${AUTO_MIN_INTERVAL/60000}-${AUTO_MAX_INTERVAL/60000} min)`;
                 scheduleNextAutoPingCycle();
             } else {
                 clearTimeout(autoPingTimeoutId);
                 clearInterval(autoPingCountdownIntervalId);
                 togglePingButton.textContent = 'Start Auto-Ping 🤖';
                 togglePingButton.classList.remove('active');
-                pingStatusDiv.textContent = 'Auto-Ping: Stopped';
+                autoPingStatusItem.classList.remove('active'); // Deactivate status-item
+                pingStatusText.textContent = 'Stopped';
                 autoPingCountdownDiv.textContent = ''; // Clear countdown when stopped
             }
         });
@@ -325,7 +423,8 @@
             if (isHeartbeatPinging) {
                 heartbeatPingButton.textContent = 'Stop Heartbeat 💖';
                 heartbeatPingButton.classList.add('active');
-                heartbeatStatusDiv.textContent = `Heartbeat: Running (~${HEARTBEAT_INTERVAL/1000}s interval)`;
+                heartbeatStatusItem.classList.add('active-red'); // Activate status-item with red
+                heartbeatStatusText.textContent = `Running (~${HEARTBEAT_INTERVAL/1000}s interval)`;
                 
                 performPingAndRecord("Heartbeat");
                 heartbeatIntervalId = setInterval(() => {
@@ -335,7 +434,8 @@
                 clearInterval(heartbeatIntervalId);
                 heartbeatPingButton.textContent = 'Start Heartbeat 💖';
                 heartbeatPingButton.classList.remove('active');
-                heartbeatStatusDiv.textContent = 'Stopped';
+                heartbeatStatusItem.classList.remove('active-red'); // Deactivate status-item
+                heartbeatStatusText.textContent = 'Stopped';
             }
         });
 

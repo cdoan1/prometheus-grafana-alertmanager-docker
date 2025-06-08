@@ -5,20 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
     <style>
-        :root {
-            --primary-blue: #007bff;
-            --primary-green: #28a745;
-            --primary-red: #dc3545;
-            --primary-orange: #ff5722;
-            --primary-purple: #8a2be2;
-            --secondary-gray: #6c757d;
-            --dark-gray: #343a40;
-            --light-gray-bg: #f8f9fa;
-            --border-color: #e0e0e0;
-            --shadow-light: rgba(0, 0, 0, 0.08);
-            --shadow-medium: rgba(0, 0, 0, 0.15);
-            --border-radius: 8px;
+        /* Define color variables for light mode */
+        :root[data-theme="light"] {
+            --color-text-primary: #2c3e50;
+            --color-text-secondary: #555;
+            --color-background-body: #f0f2f5;
+            --color-background-container: #ffffff;
+            --color-background-status: #f8f8f8;
+            --color-background-result: #f9f9f9;
+            --color-background-history-item: #fdfdfd;
+            --color-border-primary: #e0e0e0;
+            --color-border-secondary: #eee;
+            --color-shadow-light: rgba(0, 0, 0, 0.08);
+            --color-shadow-medium: rgba(0, 0, 0, 0.15);
+
+            /* Button Colors - unchanged from light mode */
+            --color-btn-auto-bg: #6c757d;
+            --color-btn-auto-active-bg: #dc3545;
+            --color-btn-manual-bg: #28a745;
+            --color-btn-heartbeat-bg: #ff5722;
+            --color-btn-heartbeat-active-bg: #d84315;
+            --color-btn-grafana-bg: #f7a81b;
+            --color-btn-prometheus-bg: #4CAF50;
+            --color-btn-disabled-bg: #cccccc;
+
+            /* Persona colors */
+            --color-persona-robot: #8a2be2;
+            --color-persona-human: #007bff;
+            --color-persona-heartbeat: #e02424;
+            --color-countdown: #d17a00;
+            --color-timestamp: #555;
+            --color-error-text: red;
         }
+
+        /* Define color variables for dark mode */
+        :root[data-theme="dark"] {
+            --color-text-primary: #f8f9fa;
+            --color-text-secondary: #ced4da;
+            --color-background-body: #212529; /* Very dark background */
+            --color-background-container: #2c3e50; /* Dark blue-grey container */
+            --color-background-status: #34495e; /* Slightly lighter dark blue-grey */
+            --color-background-result: #3a4b5d;
+            --color-background-history-item: #3d5066;
+            --color-border-primary: #495057;
+            --color-border-secondary: #3b424d;
+            --color-shadow-light: rgba(0, 0, 0, 0.4);
+            --color-shadow-medium: rgba(0, 0, 0, 0.6);
+
+            /* Button Colors - adjusted for dark mode contrast */
+            --color-btn-auto-bg: #5a6268;
+            --color-btn-auto-active-bg: #bb2d3b;
+            --color-btn-manual-bg: #1e7d34;
+            --color-btn-heartbeat-bg: #cc471d;
+            --color-btn-heartbeat-active-bg: #a6361a;
+            --color-btn-grafana-bg: #d09016;
+            --color-btn-prometheus-bg: #3c8d40;
+            --color-btn-disabled-bg: #495057; /* Darker disabled */
+
+            /* Persona colors (slightly adjusted for dark background readability) */
+            --color-persona-robot: #b39ddb; /* Lighter purple */
+            --color-persona-human: #90caf9; /* Lighter blue */
+            --color-persona-heartbeat: #ff8a65; /* Lighter red */
+            --color-countdown: #ffc107; /* Brighter orange/yellow */
+            --color-timestamp: #bbbbbb;
+            --color-error-text: #ff6b6b; /* Brighter red for errors */
+        }
+
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -28,21 +80,23 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #f0f2f5;
-            color: var(--dark-gray);
+            background-color: var(--color-background-body);
+            color: var(--color-text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
         }
         .container {
-            background-color: #ffffff;
+            background-color: var(--color-background-container);
             padding: 35px;
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px var(--shadow-light);
+            box-shadow: 0 8px 20px var(--color-shadow-light);
             text-align: center;
-            max-width: 750px; /* Slightly wider */
+            max-width: 750px;
             width: 90%;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--color-border-primary);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
         h1 {
-            color: #2c3e50;
+            color: var(--color-text-primary);
             margin-bottom: 30px;
             font-size: 2.5em;
             font-weight: 700;
@@ -51,79 +105,93 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 40px; /* More vertical space */
+            margin-bottom: 40px;
             flex-wrap: wrap;
         }
         button {
-            padding: 14px 28px; /* Larger hit area */
+            padding: 14px 28px;
             font-size: 1.05em;
             font-weight: 600;
-            color: white;
+            color: white; /* Text color remains white for buttons */
             border: none;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.15s ease, box-shadow 0.2s ease;
-            box-shadow: 0 3px 6px var(--shadow-light);
-            flex-grow: 1; /* Allow buttons to grow */
-            max-width: 200px; /* Limit button width */
+            box-shadow: 0 3px 6px var(--color-shadow-light);
+            flex-grow: 1;
+            max-width: 200px;
         }
         button:hover:not(:disabled) {
-            transform: translateY(-3px); /* More pronounced lift */
-            box-shadow: 0 6px 12px var(--shadow-medium);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px var(--color-shadow-medium);
         }
         button:disabled {
-            background-color: #cccccc;
+            background-color: var(--color-btn-disabled-bg);
             cursor: not-allowed;
             opacity: 0.7;
-            transform: none; /* No lift when disabled */
+            transform: none;
             box-shadow: none;
         }
 
         /* Specific Button Colors */
-        #togglePingButton { background-color: var(--secondary-gray); }
-        #togglePingButton.active { background-color: var(--primary-red); }
-        #manualPingButton { background-color: var(--primary-green); }
-        #heartbeatPingButton { background-color: var(--primary-orange); }
-        #heartbeatPingButton.active { background-color: #d84315; } /* Darker orange-red */
-        #grafanaLinkButton { background-color: #f7a81b; } /* Grafana orange */
-        #prometheusLinkButton { background-color: #4CAF50; } /* Prometheus green */
+        #togglePingButton { background-color: var(--color-btn-auto-bg); }
+        #togglePingButton.active { background-color: var(--color-btn-auto-active-bg); }
+        #manualPingButton { background-color: var(--color-btn-manual-bg); }
+        #heartbeatPingButton { background-color: var(--color-btn-heartbeat-bg); }
+        #heartbeatPingButton.active { background-color: var(--color-btn-heartbeat-active-bg); }
+        #grafanaLinkButton { background-color: var(--color-btn-grafana-bg); }
+        #prometheusLinkButton { background-color: var(--color-btn-prometheus-bg); }
+        #themeToggleButton { /* NEW: Theme Toggle Button Style */
+            background-color: var(--color-text-secondary);
+            font-size: 0.9em;
+            padding: 8px 15px;
+            flex-grow: 0;
+            margin-left: auto; /* Push to the right */
+            box-shadow: none;
+            width: auto;
+        }
+        #themeToggleButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px var(--color-shadow-medium);
+        }
 
         /* Status and Countdown Group */
         .status-group {
-            display: grid; /* Use grid for better alignment */
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
             width: 100%;
         }
         .status-item {
             font-size: 0.95em;
-            color: var(--dark-gray);
+            color: var(--color-text-secondary);
             padding: 12px 20px;
             border-radius: var(--border-radius);
-            background-color: var(--light-gray-bg);
-            border: 1px solid var(--border-color);
+            background-color: var(--color-background-status);
+            border: 1px solid var(--color-border-primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px var(--shadow-light);
+            box-shadow: 0 2px 4px var(--color-shadow-light);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .status-item.active {
             background-color: #e6ffe6; /* Light green for active */
             border-color: #a3e6a3;
         }
-        .status-item.active-red { /* For heartbeat active, different color */
+        .status-item.active-red {
             background-color: #ffe6e6; /* Light red */
             border-color: #ffb3b3;
         }
         .status-label {
-            font-weight: 700; /* Bolder label */
-            color: #2c3e50;
+            font-weight: 700;
+            color: var(--color-text-primary);
         }
         #autoPingCountdown {
             font-size: 1.1em;
             font-weight: 700;
-            color: #d17a00; /* Consistent orange for countdown */
+            color: var(--color-countdown);
         }
         /* End Status and Countdown Group */
 
@@ -132,85 +200,86 @@
             margin-top: 25px;
             width: 100%;
             text-align: left;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--color-border-primary);
             padding-top: 25px;
         }
         .ping-result-display-label {
             font-weight: 600;
             margin-bottom: 8px;
             display: block;
-            color: var(--dark-gray);
+            color: var(--color-text-primary);
             font-size: 1.05em;
         }
         .ping-result-display-wrapper {
-            margin-bottom: 20px; /* Space between results */
+            margin-bottom: 20px;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--color-border-secondary);
             border-radius: var(--border-radius);
-            background-color: var(--light-gray-bg);
+            background-color: var(--color-background-result);
             font-size: 0.9em;
-            min-height: 40px; /* More vertical space for content */
+            min-height: 40px;
             display: flex;
             align-items: center;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Subtle inner shadow */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         /* Persona Colors for Output */
-        .robot-ping-result { border-left: 5px solid var(--primary-purple); } /* Left border color */
-        .human-ping-result { border-left: 5px solid var(--primary-blue); }
-        .heartbeat-ping-result { border-left: 5px solid var(--primary-red); }
+        .robot-ping-result { border-left: 5px solid var(--color-persona-robot); }
+        .human-ping-result { border-left: 5px solid var(--color-persona-human); }
+        .heartbeat-ping-result { border-left: 5px solid var(--color-persona-heartbeat); }
 
-        .robot-ping-result > span.persona-label { color: var(--primary-purple); }
-        .human-ping-result > span.persona-label { color: var(--primary-blue); }
-        .heartbeat-ping-result > span.persona-label { color: var(--primary-red); }
-
+        .robot-ping-result > span.persona-label { color: var(--color-persona-robot); }
+        .human-ping-result > span.persona-label { color: var(--color-persona-human); }
+        .heartbeat-ping-result > span.persona-label { color: var(--color-persona-heartbeat); }
         /* End Individual Output Areas */
 
         #history-section {
             margin-top: 30px;
             text-align: left;
             width: 100%;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--color-border-primary);
             padding-top: 25px;
         }
         #history-section h2 {
             font-size: 1.8em;
-            color: #2c3e50;
+            color: var(--color-text-primary);
             margin-bottom: 20px;
             font-weight: 700;
         }
         #history-list {
             list-style: none;
             padding: 0;
-            max-height: 300px; /* Increased history height */
+            max-height: 300px;
             overflow-y: auto;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--color-border-primary);
             border-radius: var(--border-radius);
-            background-color: #fdfdfd;
+            background-color: var(--color-background-history-item);
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         #history-list li {
             padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0; /* Lighter separator */
+            border-bottom: 1px solid var(--color-border-secondary);
             font-size: 0.9em;
-            color: #555;
+            color: var(--color-text-secondary);
             display: flex;
             align-items: flex-start;
-            word-break: break-word; /* Ensure long messages wrap */
+            word-break: break-word;
         }
         #history-list li:last-child {
             border-bottom: none;
         }
         .timestamp {
             font-weight: 600;
-            color: #777; /* Softer color for timestamp */
+            color: var(--color-timestamp);
             margin-right: 20px;
             flex-shrink: 0;
-            min-width: 160px; /* Ensure timestamp has enough space */
+            min-width: 160px;
         }
         /* Persona labels inside history list */
-        .history-persona-label.robot-label { color: var(--primary-purple); }
-        .history-persona-label.human-label { color: var(--primary-blue); }
-        .history-persona-label.heartbeat-label { color: var(--primary-red); }
+        .history-persona-label.robot-label { color: var(--color-persona-robot); }
+        .history-persona-label.human-label { color: var(--color-persona-human); }
+        .history-persona-label.heartbeat-label { color: var(--color-persona-heartbeat); }
     </style>
 </head>
 <body>
@@ -222,7 +291,7 @@
             <button id="heartbeatPingButton">Start Heartbeat 💖</button>
             <button id="grafanaLinkButton">Grafana 📊</button>
             <button id="prometheusLinkButton">Prometheus 📈</button>
-        </div>
+            <button id="themeToggleButton">Toggle Theme ☀️</button> </div>
 
         <div class="status-group">
             <div class="status-item" id="autoPingStatusItem">
@@ -256,21 +325,22 @@
 
     <script>
         // DOM Elements
+        const htmlElement = document.documentElement; // Get the root HTML element
         const togglePingButton = document.getElementById('togglePingButton');
         const manualPingButton = document.getElementById('manualPingButton');
         const heartbeatPingButton = document.getElementById('heartbeatPingButton');
         const grafanaLinkButton = document.getElementById('grafanaLinkButton');
         const prometheusLinkButton = document.getElementById('prometheusLinkButton');
+        const themeToggleButton = document.getElementById('themeToggleButton'); // NEW: Theme button
+        
         const pingStatusText = document.getElementById('ping-status');
         const heartbeatStatusText = document.getElementById('heartbeat-status');
 
-        // Status Item wrappers for class toggling
         const autoPingStatusItem = document.getElementById('autoPingStatusItem');
         const heartbeatStatusItem = document.getElementById('heartbeatStatusItem');
 
         const autoPingCountdownDiv = document.getElementById('autoPingCountdown');
 
-        // Dedicated output divs
         const autoPingOutputDiv = document.getElementById('autoPingOutput');
         const manualPingOutputDiv = document.getElementById('manualPingOutput');
         const heartbeatPingOutputDiv = document.getElementById('heartbeatPingOutput');
@@ -290,13 +360,41 @@
         let heartbeatIntervalId;
         const HEARTBEAT_INTERVAL = 1000; // 1 beat per second
 
+        // --- Theme Logic ---
+        const themeKey = 'pingpong-theme';
+
+        function applyTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem(themeKey, theme);
+            themeToggleButton.textContent = theme === 'dark' ? 'Toggle Theme ☀️' : 'Toggle Theme 🌙';
+        }
+
+        function toggleTheme() {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        }
+
+        // Initialize theme on page load
+        (function() {
+            const savedTheme = localStorage.getItem(themeKey);
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        })();
+        // --- End Theme Logic ---
+
+
         // --- Core Ping Function ---
         async function performPingAndRecord(persona = "Human") {
             const personaLabel = persona === "Robot" ? "🤖 Robot Ping" :
                                  persona === "Human" ? "🧑‍💻 Human Ping" :
                                  "💖 Heartbeat Ping";
             
-            // Get the specific output div based on persona
             const currentOutputDivToUpdate = persona === "Robot" ? autoPingOutputDiv :
                                              persona === "Human" ? manualPingOutputDiv :
                                              heartbeatPingOutputDiv;
@@ -326,12 +424,12 @@
                 } else {
                     currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Error: ${response.status} ${response.statusText}`;
                     console.error('Server responded with an error:', response.status, response.statusText);
-                    addHistoryEntry(startTime, `<span class="${labelClass} history-persona-label">${personaLabel}:</span> <span style="color: red;">Error: ${response.status} ${response.statusText}</span>`);
+                    addHistoryEntry(startTime, `<span class="${labelClass} history-persona-label">${personaLabel}:</span> <span style="color: var(--color-error-text);">Error: ${response.status} ${response.statusText}</span>`);
                 }
             } catch (error) {
                 currentOutputDivToUpdate.innerHTML = `<span class="${labelClass}">${personaLabel}:</span> Network Error: ${error.message}`;
                 console.error('Could not fetch ping response:', error);
-                addHistoryEntry(startTime, `<span class="${labelClass} history-persona-label">${personaLabel}:</span> <span style="color: red;">Network Error: ${error.message}</span>`);
+                addHistoryEntry(startTime, `<span class="${labelClass} history-persona-label">${personaLabel}:</span> <span style="color: var(--color-error-text);">Network Error: ${error.message}</span>`);
             } finally {
                 // Re-enable manual button after ping completes
                 if (persona === "Human") {
@@ -386,7 +484,7 @@
             autoPingCountdownIntervalId = setInterval(updateAutoPingCountdownDisplay, 1000);
             updateAutoPingCountdownDisplay(); // Call immediately for initial display
 
-            autoPingTimeoutId = setTimeout(() => {
+            pingTimeoutId = setTimeout(() => {
                 scheduleNextAutoPingCycle();
             }, randomDelay);
         }
@@ -397,7 +495,7 @@
             if (isAutoPinging) {
                 togglePingButton.textContent = 'Stop Auto-Ping 🤖';
                 togglePingButton.classList.add('active');
-                autoPingStatusItem.classList.add('active'); // Activate status-item
+                autoPingStatusItem.classList.add('active');
                 pingStatusText.textContent = `Running (Interval: ${AUTO_MIN_INTERVAL/60000}-${AUTO_MAX_INTERVAL/60000} min)`;
                 scheduleNextAutoPingCycle();
             } else {
@@ -405,7 +503,7 @@
                 clearInterval(autoPingCountdownIntervalId);
                 togglePingButton.textContent = 'Start Auto-Ping 🤖';
                 togglePingButton.classList.remove('active');
-                autoPingStatusItem.classList.remove('active'); // Deactivate status-item
+                autoPingStatusItem.classList.remove('active');
                 pingStatusText.textContent = 'Stopped';
                 autoPingCountdownDiv.textContent = ''; // Clear countdown when stopped
             }
@@ -423,7 +521,7 @@
             if (isHeartbeatPinging) {
                 heartbeatPingButton.textContent = 'Stop Heartbeat 💖';
                 heartbeatPingButton.classList.add('active');
-                heartbeatStatusItem.classList.add('active-red'); // Activate status-item with red
+                heartbeatStatusItem.classList.add('active-red');
                 heartbeatStatusText.textContent = `Running (~${HEARTBEAT_INTERVAL/1000}s interval)`;
                 
                 performPingAndRecord("Heartbeat");
@@ -434,20 +532,23 @@
                 clearInterval(heartbeatIntervalId);
                 heartbeatPingButton.textContent = 'Start Heartbeat 💖';
                 heartbeatPingButton.classList.remove('active');
-                heartbeatStatusItem.classList.remove('active-red'); // Deactivate status-item
+                heartbeatStatusItem.classList.remove('active-red');
                 heartbeatStatusText.textContent = 'Stopped';
             }
         });
 
-        // Event listener for the Grafana link button
+        // --- External Link Buttons ---
         grafanaLinkButton.addEventListener('click', () => {
             window.open('http://localhost:3000/dashboards', '_blank');
         });
 
-        // Event listener for the Prometheus link button
         prometheusLinkButton.addEventListener('click', () => {
             window.open('http://localhost:9090/', '_blank');
         });
+
+        // --- Theme Toggle ---
+        themeToggleButton.addEventListener('click', toggleTheme);
+
     </script>
 </body>
 </html>
